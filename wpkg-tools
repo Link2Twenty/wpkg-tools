@@ -1,0 +1,195 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Switch;
+use Net::Ping;
+use Term::ReadKey;
+
+# Site specific details are stored in this file
+require "/usr/local/sbin/wpkg-variables.pl";
+
+# Argument flags (set to true if flag is detected)
+my $arg_u = 0; # username
+my $arg_p = 0; # password
+my $arg_m = 0; # machine
+my $arg_s = 0; # status
+my $arg_r = 0; # report
+my $arg_h = 0; # help
+
+# Declaring the variables from the other file
+our ($user, $wpkg_reports);
+
+# Variables set by arguments
+my $arg_username = "administrator";
+my $arg_password;
+my $arg_error;
+
+# Array for storing computer names
+my @computers;
+
+# Subroutines for arguments
+# Sets arg_username to user input and updates arg_u flag
+sub username {
+  my $pos = shift;
+  if ($ARGV[$pos + 1]) {
+    $arg_u = 1;
+    $arg_username = $ARGV[$pos + 1];
+  } else {
+    $arg_error .= "Error: Missing Argument (username)\n"
+  }
+}
+# Sets arg_password to user input and updates arg_p flag
+sub password {
+  my $pos = shift;
+  if ($ARGV[$pos + 1]) {
+    $arg_p = 1;
+    $arg_password = $ARGV[$pos + 1];
+  } else {
+    $arg_error .= "Error: Missing Argument (password)\n"
+  }
+}
+# Sets arg_password to user input and updates arg_p flag
+sub prompt {
+  print "[wpkg_start] password for ".$arg_username.": ";
+  ReadMode('noecho'); # don't echo
+  chomp($arg_password = <STDIN>);
+  ReadMode(0);        # back to normal
+  print "\n";
+  $arg_p = 1;
+}
+# Sets @computers to user input and updates arg_m flag
+sub machine {
+  my $pos = shift;
+  if ($ARGV[$pos + 1]) {
+    $arg_m = 1;
+    push(@computers, $ARGV[$pos + 1]);
+  } else {
+    $arg_error .= "Error: Missing Argument (machine)\n"
+  }
+}
+# Updates arg_s flag
+sub status {
+  $arg_s = 1;
+}
+
+# Updates arg_r flag
+sub report {
+  $arg_r = 1;
+}
+
+# Prints out help information and sets arg_h flag
+sub help {
+  $arg_h = 1;
+  print "Usage: wpkg-tools [OPTION...]\n";
+  print "-u, --username       Set a non-default username (password required)\n";
+  print "-p, --password       Set a non-default password (string)\n";
+  print "-P, --prompt         Set a non-default password (prompt)\n";
+  print "-m, --machine        Only run command for one specific computer\n";
+  print "-r, --report         Display latest wpkg report\n";
+  print "-s, --status         Display current status of WPKG service\n";
+  print "-h, -?, --help       Display help screen\n";
+}
+
+# Ping object
+my $p = Net::Ping->new("icmp");
+# Ping time out
+my $timeout = 10;
+
+# Hash of arguments
+my %Args = (
+  "-u"          => "username",
+  "--username"  => "username",
+  "-p"          => "password",
+  "--password"  => "password",
+  "-P"          => "prompt",
+  "--prompt"    => "prompt",
+  "-m"          => "machine",
+  "--machine"   => "machine",
+  "-s"          => "status",
+  "--status"    => "status",
+  "-r"          => "report",
+  "--report"    => "report",
+  "-h"          => "help",
+  "--help"      => "help",
+  "-?"          => "help",
+);
+
+# Run argument subroutines
+foreach my $argnum (0 .. $#ARGV) {
+  if ($Args{$ARGV[$argnum]}) {
+    switch ($Args{$ARGV[$argnum]}) {
+      case "username" {username($argnum)}
+      case "password" {password($argnum)}
+      case "prompt"   {prompt()}
+      case "machine"  {machine($argnum)}
+      case "status"   {status()}
+      case "report"   {report()}
+      case "help"     {help()}
+    }
+  }
+}
+
+# If a report is requested get it, must be outside sub routine to allow machine to run after report.
+if (!$arg_h && $arg_r) {
+  my $filename = $arg_m ? $wpkg_reports.'/wpkg-'.uc($computers[0]).'.log' : $wpkg_reports.'/wpkg-*.log';
+  if( -e $filename || !$arg_m ) {
+    system('awk -v date="$(date +"%Y-%m-%d")" -f /opt/updates/scripts/wpkgreports.awk '.$filename.' | less');
+  } else {
+    print "Error: No report found for the computer '".$computers[0]."'\n";
+  }
+}
+
+# Only run this if help or report hasn't been requested
+if (!$arg_h && !$arg_r) {
+  # Only run this if a username or password has been presented
+  if ($arg_u || $arg_p) {
+    if (!$arg_p) {
+      prompt();
+    }
+    $user = $arg_username."%".$arg_password;
+  }
+  
+  # If there is an error print it and stop
+  if ($arg_error) {
+    print $arg_error;
+  # If not error is reported carry on
+  } else {
+    # If a machine has not been manually set get the data from the directory
+    if (!$arg_m) {
+      # Open WPKG directory and put the names of the files in an array
+      opendir my $dir, $wpkg_reports or die "Cannot open directory: $!";
+      my @files = readdir $dir;
+      closedir $dir;
+
+      # Strip wpkg- and .log from file names and put new string in computer names array
+      foreach my $file (@files) {
+        if ( $file =~ m/wpkg/ ) {
+          push(@computers, substr($file, 5, -4));
+        }
+      }
+    }
+
+    # Foreach loop running over computer names
+    foreach my $computer (@computers) {
+      # Print computer name for when ran manually
+      print $computer.":\n";
+      # Check to see if computer responds to ping
+      if( $p->ping($computer, $timeout) ) {
+        # If there is a response look at WpkgService
+        if ($arg_s) {
+          system("net rpc service status WpkgService -I $computer -U $user");
+        } else {
+          system("net rpc service stop WpkgService -I $computer -U $user");
+          system("net rpc service start WpkgService -I $computer -U $user");
+        }
+      } else {
+        # If there is not a response report error
+        print "Warning: ".$computer." could not be contacted\n";
+      }
+    }
+  }
+}
+
+# Close ping object
+$p->close();
