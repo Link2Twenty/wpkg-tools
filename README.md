@@ -69,9 +69,10 @@ Usage: wpkg-tools [OPTION...]
 
 ## Authors
 
-* **Andrew Bone** - *Initial work* - [Link2Twenty](https://github.com/Link2Twenty/)
-* **Dave Evans** - *Initial work* - [stringydave](https://github.com/stringydave/)
+* **Andrew Bone** - [Link2Twenty](https://github.com/Link2Twenty/)
+* **Dave Evans** - [stringydave](https://github.com/stringydave/)
 
 ## Acknowledgments
 
 [WPKG](https://wpkg.org/Main_Page)
+[wpkgreports.awk](https://github.com/stringydave/) by [Dave Evans](https://github.com/stringydave/)
