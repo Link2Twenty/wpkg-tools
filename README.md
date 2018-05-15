@@ -79,6 +79,4 @@ Usage: wpkg-tools [OPTION...]
 * Article on Wikipedia - https://en.wikipedia.org/wiki/WPKG_(software)
 
 ## Acknowledgments
-
-[WPKG](https://wpkg.org/Main_Page)
-[wpkgreports.awk](https://github.com/stringydave/) by [Dave Evans](https://github.com/stringydave/)
+ * [wpkgreports.awk](https://github.com/stringydave/) by [Dave Evans](https://github.com/stringydave/)
