@@ -13,18 +13,18 @@ You will need to edit wpkg-variables.pl to be correct for your own site.
 wpkg-tools presumes several things:
  * You are using a debian based operating system
  * You have your WPKG reports stored somewhere accessible
- * You have (wpkgreports.awk)[https://github.com/stringydave/] added
- * You have (samba-common)[https://packages.ubuntu.com/search?keywords=samba-common] installed
- * You have (perl)[https://wiki.debian.org/Perl] installed
+ * You have [wpkgreports.awk](https://github.com/stringydave/) added
+ * You have [samba-common](https://packages.ubuntu.com/search?keywords=samba-common) installed
+ * You have [perl](https://wiki.debian.org/Perl) installed
 
 There are also several perl components used:
- * (libswitch-perl)[https://packages.debian.org/sid/libswitch-perl]
- * (libnet-ping-external-perl)[https://packages.debian.org/wheezy/libnet-ping-external-perl]
- * (libterm-readkey-perl)[https://packages.debian.org/sid/libterm-readkey-perl]
+ * [libswitch-perl](https://packages.debian.org/sid/libswitch-perl)
+ * [libnet-ping-external-perl](https://packages.debian.org/wheezy/libnet-ping-external-perl)
+ * [libterm-readkey-perl](https://packages.debian.org/sid/libterm-readkey-perl)
 
  ### Installing
 
- ** Downloading scripts: **
+ **Downloading scripts:**
 
 It's best to run this commands as root or with sudo
 
@@ -43,7 +43,7 @@ our $user = "username%password";
 our $wpkg_reports = "/location/of/wpkgreports";
 ```
 
- ** Installing prerequisites: **
+ **Installing prerequisites:**
 
  ```
 apt install samba-common
@@ -74,4 +74,4 @@ Usage: wpkg-tools [OPTION...]
 
 ## Acknowledgments
 
-(WPKG)[https://wpkg.org/Main_Page]
+[WPKG](https://wpkg.org/Main_Page)
