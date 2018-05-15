@@ -1,6 +1,6 @@
 # wpkg-tools
 
-**wpkg-tools** is command line interface to interact with (WPKG)[https://wpkg.org/Main_Page] clients from debian, it is written in perl.
+**wpkg-tools** is command line interface to interact with [WPKG](https://wpkg.org/Main_Page) clients from debian, it is written in perl.
 
 ## Getting Started
 
