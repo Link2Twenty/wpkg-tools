@@ -72,6 +72,12 @@ Usage: wpkg-tools [OPTION...]
 * **Andrew Bone** - [Link2Twenty](https://github.com/Link2Twenty/)
 * **Dave Evans** - [stringydave](https://github.com/stringydave/)
 
+## Some links
+
+* Main the WPKG website - https://wpkg.org/
+* WPKG documentation page - https://wpkg.org/Documentation
+* Article on Wikipedia - https://en.wikipedia.org/wiki/WPKG_(software)
+
 ## Acknowledgments
 
 [WPKG](https://wpkg.org/Main_Page)
