@@ -26,7 +26,7 @@ There are also several perl components used:
 
  **Downloading scripts:**
 
-It's best to run this commands as root or with sudo
+It's best to run these commands with sudo or as root
 
  ```
 wget https://raw.githubusercontent.com/Link2Twenty/wpkg-tools/master/wpkg-tools -P /usr/local/sbin/
