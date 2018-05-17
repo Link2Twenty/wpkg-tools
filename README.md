@@ -13,7 +13,7 @@ You will need to edit wpkg-variables.pl to be correct for your own site.
 wpkg-tools presumes several things:
  * You are using a debian based operating system
  * You have your WPKG reports stored somewhere accessible
- * You have [wpkgreports.awk](https://github.com/stringydave/) added
+ * You have [wpkgreports.awk](https://github.com/stringydave/wpkgreports) added
  * You have [samba-common](https://packages.ubuntu.com/search?keywords=samba-common) installed
  * You have [perl](https://wiki.debian.org/Perl) installed
 
@@ -79,4 +79,4 @@ Usage: wpkg-tools [OPTION...]
 * Article on Wikipedia - https://en.wikipedia.org/wiki/WPKG_(software)
 
 ## Acknowledgments
- * [wpkgreports.awk](https://github.com/stringydave/) by [Dave Evans](https://github.com/stringydave/)
+ * [wpkgreports.awk](https://github.com/stringydave/) by [Dave Evans](https://github.com/stringydave/wpkgreports)
