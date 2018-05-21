@@ -89,12 +89,21 @@ sub help {
   print "-r, --report         Display latest wpkg report\n";
   print "-s, --status         Display current status of WPKG service\n";
   print "-h, -?, --help       Display help screen\n";
+  exit 1;
 }
 
-# Ping object
-my $p = Net::Ping->new("icmp");
-# Ping time out
-my $timeout = 10;
+# Find the longest computer name
+sub computerNames {
+  my $max = -1;
+  my $max_ref;
+  for (@_) {
+    if (length > $max) {
+      $max = length;
+      $max_ref = \$_;
+    }
+  }
+  $$max_ref
+}
 
 # Hash of arguments
 my %Args = (
@@ -130,65 +139,75 @@ foreach my $argnum (0 .. $#ARGV) {
   }
 }
 
+# If there is an error print it and stop
+if ($arg_error) {
+  print $arg_error;
+  exit 0;
+}
+
 # If a report is requested get it, must be outside sub routine to allow machine to run after report.
-if (!$arg_h && $arg_r) {
+if ($arg_r) {
   my $filename = $arg_m ? $wpkg_reports.'/wpkg-'.uc($computers[0]).'.log' : $wpkg_reports.'/wpkg-*.log';
   if( -e $filename || !$arg_m ) {
     system('awk -v date="$(date +"%Y-%m-%d")" -f /opt/updates/scripts/wpkgreports.awk '.$filename.' | less');
   } else {
     print "Error: No report found for the computer '".$computers[0]."'\n";
+    exit 0;
+  }
+  exit 1;
+}
+
+# Only run this if a username or password has been presented
+if ($arg_u || $arg_p) {
+  if (!$arg_p) {
+    prompt();
+  }
+  $user = $arg_username."%".$arg_password;
+}
+
+# If a machine has not been manually set get the data from the directory
+if (!$arg_m) {
+  # Open WPKG directory and put the names of the files in an array
+  opendir my $dir, $wpkg_reports or die "Cannot open directory: $!";
+  my @files = readdir $dir;
+  closedir $dir;
+
+  # Strip wpkg- and .log from file names and put new string in computer names array
+  foreach my $file (@files) {
+    if ( $file =~ m/wpkg/ ) {
+      push(@computers, substr($file, 5, -4));
+    }
   }
 }
 
-# Only run this if help or report hasn't been requested
-if (!$arg_h && !$arg_r) {
-  # Only run this if a username or password has been presented
-  if ($arg_u || $arg_p) {
-    if (!$arg_p) {
-      prompt();
+# Store the length of the longest name
+my $nameLength = length(computerNames(@computers));
+# Create ping object
+my $p = Net::Ping->new("icmp");
+# For each loop running over computer names
+foreach my $computer (@computers) {
+  print $computer;
+  print " " x ($nameLength - length($computer));
+  print "\t";
+  # Print computer name for when ran manually
+  # Check to see if computer responds to ping
+  if( $p->ping($computer, 2) ) {
+    my $serviceTest = `net rpc service status WpkgService -I $computer -U $user 2>&1`;
+    # If there is a response look at WpkgService
+    if (index($serviceTest, "running") != -1) {
+      # system("net rpc service stop WpkgService -I $computer -U $user");
+      print $arg_s?"WpkgService is running":"WpkgService is already running";
+    } elsif (index($serviceTest, "NT_STATUS_LOGON_FAILURE") != -1) {
+      print "Supplied user credientals are incorrect";
+    } else {
+      if(!$arg_s) {my $serviceStart = `net rpc service start WpkgService -I $computer -U $user`;}
+      print $arg_s?"WpkgService is stopped":"Successfully started WpkgService";
     }
-    $user = $arg_username."%".$arg_password;
-  }
-  
-  # If there is an error print it and stop
-  if ($arg_error) {
-    print $arg_error;
-  # If not error is reported carry on
   } else {
-    # If a machine has not been manually set get the data from the directory
-    if (!$arg_m) {
-      # Open WPKG directory and put the names of the files in an array
-      opendir my $dir, $wpkg_reports or die "Cannot open directory: $!";
-      my @files = readdir $dir;
-      closedir $dir;
-
-      # Strip wpkg- and .log from file names and put new string in computer names array
-      foreach my $file (@files) {
-        if ( $file =~ m/wpkg/ ) {
-          push(@computers, substr($file, 5, -4));
-        }
-      }
-    }
-
-    # Foreach loop running over computer names
-    foreach my $computer (@computers) {
-      # Print computer name for when ran manually
-      print $computer.":\n";
-      # Check to see if computer responds to ping
-      if( $p->ping($computer, $timeout) ) {
-        # If there is a response look at WpkgService
-        if ($arg_s) {
-          system("net rpc service status WpkgService -I $computer -U $user");
-        } else {
-          system("net rpc service stop WpkgService -I $computer -U $user");
-          system("net rpc service start WpkgService -I $computer -U $user");
-        }
-      } else {
-        # If there is not a response report error
-        print "Warning: ".$computer." could not be contacted\n";
-      }
-    }
+    # If there is not a response report error
+    print "Ping request timed out";
   }
+  print "\n";
 }
 
 # Close ping object
