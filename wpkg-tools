@@ -51,7 +51,7 @@ sub password {
 }
 # Sets arg_password to user input and updates arg_p flag
 sub prompt {
-  print "[wpkg_start] password for ".$arg_username.": ";
+  print "[wpkg-tools] password for ".$arg_username.": ";
   ReadMode('noecho'); # don't echo
   chomp($arg_password = <STDIN>);
   ReadMode(0);        # back to normal
