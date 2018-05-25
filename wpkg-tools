@@ -89,7 +89,7 @@ sub help {
   print "-r, --report         Display latest wpkg report\n";
   print "-s, --status         Display current status of WPKG service\n";
   print "-h, -?, --help       Display help screen\n";
-  exit 1;
+  exit 0;
 }
 
 # Find the longest computer name
@@ -142,7 +142,7 @@ foreach my $argnum (0 .. $#ARGV) {
 # If there is an error print it and stop
 if ($arg_error) {
   print $arg_error;
-  exit 0;
+  exit 22;
 }
 
 # If a report is requested get it, must be outside sub routine to allow machine to run after report.
@@ -152,9 +152,9 @@ if ($arg_r) {
     system('awk -v date="$(date +"%Y-%m-%d")" -f /opt/updates/scripts/wpkgreports.awk '.$filename.' | less');
   } else {
     print "Error: No report found for the computer '".$computers[0]."'\n";
-    exit 0;
+    exit 2;
   }
-  exit 1;
+  exit 0;
 }
 
 # Only run this if a username or password has been presented
