@@ -200,7 +200,7 @@ foreach my $computer (@computers) {
     } elsif (index($serviceTest, "NT_STATUS_LOGON_FAILURE") != -1) {
       print "Supplied user credientals are incorrect";
     } else {
-      if(!$arg_s) {my $serviceStart = `net rpc service start WpkgService -I $computer -U $user`;}
+      if(!$arg_s) {my $serviceStart = `net rpc service start WpkgService -I $computer -U $user 2>&1`;}
       print $arg_s?"WpkgService is stopped":"Successfully started WpkgService";
     }
   } else {
