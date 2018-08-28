@@ -202,6 +202,12 @@ foreach my $computer (@computers) {
     print "Supplied user credientals are incorrect\n";
     next;
   }
+
+  # Check user for Access Denied
+  if (index($credentialCheck, "NT_STATUS_ACCESS_DENIED") != -1) {
+    print "Supplied user is not admin\n";
+    next;
+  }
   
   # Check if service is in the service list
   my $serviceExists = `net rpc service list -I $computer -U $user | grep "WpkgService"`;
