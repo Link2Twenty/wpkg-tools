@@ -9,6 +9,9 @@ use Term::ReadKey;
 # Site specific details are stored in this file
 require "/usr/local/sbin/wpkg-variables.pl";
 
+# Version number
+my $version = "v0.1.2"
+
 # Argument flags (set to true if flag is detected)
 my $arg_u = 0; # username
 my $arg_p = 0; # password
@@ -16,6 +19,7 @@ my $arg_m = 0; # machine
 my $arg_s = 0; # status
 my $arg_r = 0; # report
 my $arg_h = 0; # help
+my $arg_v = 0; # version
 
 # Declaring the variables from the other file
 our ($user, $wpkg_reports);
@@ -88,7 +92,14 @@ sub help {
   print "-m, --machine        Only run command for one specific computer\n";
   print "-r, --report         Display latest wpkg report\n";
   print "-s, --status         Display current status of WPKG service\n";
+  print "-v, --version        Display version of wpkg-tools\n";
   print "-h, -?, --help       Display help screen\n";
+  exit 0;
+}
+
+sub version {
+  $arg_h = 1;
+  print "Version ".$version."\n";
   exit 0;
 }
 
@@ -122,6 +133,8 @@ my %Args = (
   "-h"          => "help",
   "--help"      => "help",
   "-?"          => "help",
+  "-v"          => "version",
+  "--version"   => "version",
 );
 
 # Run argument subroutines
@@ -135,6 +148,7 @@ foreach my $argnum (0 .. $#ARGV) {
       case "status"   {status()}
       case "report"   {report()}
       case "help"     {help()}
+      case "version"  {version()}
     }
   }
 }
