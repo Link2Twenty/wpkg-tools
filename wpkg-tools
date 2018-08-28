@@ -10,7 +10,7 @@ use Term::ReadKey;
 require "/usr/local/sbin/wpkg-variables.pl";
 
 # Version number
-my $version = "v0.1.2"
+my $version = "v0.1.2";
 
 # Argument flags (set to true if flag is detected)
 my $arg_u = 0; # username
@@ -101,6 +101,11 @@ sub version {
   $arg_h = 1;
   print "Version ".$version."\n";
   exit 0;
+}
+
+sub update {
+  my $latestVersion = `curl --silent "https://api.github.com/repos/Link2Twenty/wpkg-tools/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`;
+
 }
 
 # Find the longest computer name
