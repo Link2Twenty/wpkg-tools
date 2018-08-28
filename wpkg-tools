@@ -189,25 +189,44 @@ foreach my $computer (@computers) {
   print $computer;
   print " " x ($nameLength - length($computer));
   print "\t";
-  # Print computer name for when ran manually
+  
   # Check to see if computer responds to ping
-  if( $p->ping($computer, 2) ) {
-    my $serviceTest = `net rpc service status WpkgService -I $computer -U $user 2>&1`;
-    # If there is a response look at WpkgService
-    if (index($serviceTest, "running") != -1) {
-      # system("net rpc service stop WpkgService -I $computer -U $user");
-      print $arg_s?"WpkgService is running":"WpkgService is already running";
-    } elsif (index($serviceTest, "NT_STATUS_LOGON_FAILURE") != -1) {
-      print "Supplied user credientals are incorrect";
+  if( !$p->ping($computer, 2) ) {
+    print "Ping request timed out\n";
+    next;
+  }
+  
+  # Check user credentials are correct
+  my $credentialCheck = `net rpc info -I $computer -U $user 2>&1`;
+  if (index($credentialCheck, "NT_STATUS_LOGON_FAILURE") != -1) {
+    print "Supplied user credientals are incorrect\n";
+    next;
+  }
+  
+  # Check if service is in the service list
+  my $serviceExists = `net rpc service list -I $computer -U $user | grep "WpkgService"`;
+  if (!$serviceExists) {
+    print "WpkgService is not installed!\n";
+    next;
+  }
+  
+  # Check current service status
+  my $serviceTest = `net rpc service status WpkgService -I $computer -U $user`;
+  if (index($serviceTest, "running") != -1) {
+    if ($arg_s) {
+      print "WpkgService is running" 
     } else {
-      if(!$arg_s) {my $serviceStart = `net rpc service start WpkgService -I $computer -U $user`;}
-      print $arg_s?"WpkgService is stopped":"Successfully started WpkgService";
+      print "WpkgService is already running"
     }
   } else {
-    # If there is not a response report error
-    print "Ping request timed out";
+    if ($arg_s) {
+      print "WpkgService is stopped" 
+    } else {
+      my $serviceStart = `net rpc service start WpkgService -I $computer -U $user 2>&1`;
+      print "Successfully started WpkgService"
+    }
   }
-  print "\n";
+  print "\n"
 }
 
 # Close ping object
