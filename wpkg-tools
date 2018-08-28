@@ -104,8 +104,17 @@ sub version {
 }
 
 sub update {
-  my $latestVersion = `curl --silent "https://api.github.com/repos/Link2Twenty/wpkg-tools/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`;
-
+  my $gitData = `wget --quiet -O- "https://api.github.com/repos/Link2Twenty/wpkg-tools/releases/latest" | grep '"tag_name"'`;
+  my $latestVersion = substr($gitData, 15, -3);
+  
+  if ($latestVersion eq $version) {
+    print "wpkg-tools is already on the latest version (".$version.")\n";
+    exit 0;
+  } else {
+    print "wpkg-tools will be updated to version ".$latestVersion."\n";
+    system('wget --quiet https://raw.githubusercontent.com/Link2Twenty/wpkg-tools/'.$latestVersion.'/wpkg-tools -O /usr/local/sbin/wpkg-tools');
+    exit 0;
+  }
 }
 
 # Find the longest computer name
