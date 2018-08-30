@@ -93,12 +93,13 @@ sub help {
   print "-r, --report         Display latest wpkg report\n";
   print "-s, --status         Display current status of WPKG service\n";
   print "-v, --version        Display version of wpkg-tools\n";
+  print "--update             Update to latest release of wpkg-tools\n"
   print "-h, -?, --help       Display help screen\n";
   exit 0;
 }
 
 sub version {
-  $arg_h = 1;
+  $arg_v = 1;
   print "Version ".$version."\n";
   exit 0;
 }
@@ -149,6 +150,7 @@ my %Args = (
   "-?"          => "help",
   "-v"          => "version",
   "--version"   => "version",
+  "--update"    => "update",
 );
 
 # Run argument subroutines
@@ -163,6 +165,7 @@ foreach my $argnum (0 .. $#ARGV) {
       case "report"   {report()}
       case "help"     {help()}
       case "version"  {version()}
+      case "update"   {update()}
     }
   }
 }
