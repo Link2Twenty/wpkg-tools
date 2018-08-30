@@ -54,6 +54,24 @@ apt install libnet-ping-external-perl
 apt install libswitch-perl
  ```
 
+ **Updating**
+
+ This should be as simple as running the update script
+
+ ```
+server:~# wpkg-tools --update
+wpkg-tools is already on the latest version (v0.1.2)
+server:~# wpkg-tools --version
+v0.1.2
+ ```
+
+ ```
+server:~# wpkg-tools --update
+wpkg-tools will be updated to version v0.1.3
+server:~# wpkg-tools --version
+v0.1.3
+ ```
+
 ## Usage
 
 ```
@@ -64,6 +82,8 @@ Usage: wpkg-tools [OPTION...]
 -m, --machine        Only run command for one specific computer
 -r, --report         Display latest wpkg report
 -s, --status         Display current status of WPKG service
+-v, --version        Display version of wpkg-tools
+--update             Update to latest release of wpkg-tools
 -h, -?, --help       Display help screen
 ```
 
