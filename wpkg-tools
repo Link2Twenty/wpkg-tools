@@ -93,7 +93,7 @@ sub help {
   print "-r, --report         Display latest wpkg report\n";
   print "-s, --status         Display current status of WPKG service\n";
   print "-v, --version        Display version of wpkg-tools\n";
-  print "--update             Update to latest release of wpkg-tools\n"
+  print "--update             Update to latest release of wpkg-tools\n";
   print "-h, -?, --help       Display help screen\n";
   exit 0;
 }
